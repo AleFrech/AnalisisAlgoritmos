@@ -38,11 +38,14 @@
  */
 package org.jgrapht.alg;
 
-import java.util.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphColorTuple;
+import org.jgrapht.GraphPath;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.GraphPathImpl;
+import org.jgrapht.traverse.ClosestFirstIterator;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-import org.jgrapht.traverse.*;
+import java.util.*;
 
 
 /**
@@ -58,6 +61,9 @@ public final class DijkstraShortestPath<V, E>
     
 
     private GraphPath<V, E> path;
+    private ArrayList<GraphColorTuple<V, E>> graphList;
+    private GraphColorTuple<V,E> newColorTuple= new GraphColorTuple<>();
+
 
     
 
@@ -88,25 +94,49 @@ public final class DijkstraShortestPath<V, E>
      * @param radius limit on weighted path length, or Double.POSITIVE_INFINITY
      * for unbounded search
      */
-    public DijkstraShortestPath(
-        Graph<V, E> graph,
-        V startVertex,
-        V endVertex,
-        double radius)
+
+
+    public DijkstraShortestPath(Graph<V, E> graph, V startVertex, V endVertex, double radius)
     {
+
+
         if (!graph.containsVertex(endVertex)) {
             throw new IllegalArgumentException(
                 "graph must contain the end vertex");
         }
 
-        ClosestFirstIterator<V, E> iter =
-            new ClosestFirstIterator<V, E>(graph, startVertex, radius);
+
+        Set<V> vertexStart = new HashSet<>();
+
+        V source = null;
+        V target = null;
+        Set<V> vertexset =graph.vertexSet();
+        ArrayList<V> vertexList= new ArrayList<>();
+        vertexList.addAll(vertexset);
+        for(int i=0;i<vertexList.size();i++){
+            if(vertexList.get(i).equals(startVertex)){
+                 source = vertexList.get(i);
+            }
+            if(vertexList.get(i).equals(startVertex)){
+                target= vertexList.get(i);
+            }
+        }
+
+        vertexStart.add(source);
+        vertexStart.add(target);
+        graphList = new ArrayList<>();
+        newColorTuple.vertexColors.add(new HashSet<V>());
+        newColorTuple.vertexColors.add(vertexStart);
+
+
+        ClosestFirstIterator<V, E> iter = new ClosestFirstIterator<V, E>(graph, startVertex, radius);
 
         while (iter.hasNext()) {
             V vertex = iter.next();
 
             if (vertex.equals(endVertex)) {
                 createEdgeList(graph, iter, startVertex, endVertex);
+                graphList.add(newColorTuple);
                 return;
             }
         }
@@ -154,6 +184,11 @@ public final class DijkstraShortestPath<V, E>
         }
     }
 
+    public ArrayList<GraphColorTuple<V, E>> getGraphList() {
+        return graphList;
+    }
+
+
     /**
      * Convenience method to find the shortest path via a single static method
      * call. If you need a more advanced search (e.g. limited by radius, or
@@ -165,10 +200,7 @@ public final class DijkstraShortestPath<V, E>
      *
      * @return List of Edges, or null if no path exists
      */
-    public static <V, E> List<E> findPathBetween(
-        Graph<V, E> graph,
-        V startVertex,
-        V endVertex)
+    public static <V, E> List<E> findPathBetween(Graph<V, E> graph, V startVertex, V endVertex)
     {
         DijkstraShortestPath<V, E> alg =
             new DijkstraShortestPath<V, E>(
@@ -179,13 +211,11 @@ public final class DijkstraShortestPath<V, E>
         return alg.getPathEdgeList();
     }
 
-    private void createEdgeList(
-        Graph<V, E> graph,
-        ClosestFirstIterator<V, E> iter,
-        V startVertex,
-        V endVertex)
+    private void createEdgeList(Graph<V, E> graph, ClosestFirstIterator<V, E> iter, V startVertex, V endVertex)
     {
         List<E> edgeList = new ArrayList<E>();
+        Set<V> vertexEnd = new HashSet<>();
+        Set<V>  tmpVertex = new HashSet<>();
 
         V v = endVertex;
 
@@ -195,20 +225,24 @@ public final class DijkstraShortestPath<V, E>
             if (edge == null) {
                 break;
             }
-
+            Set<E> evaluatedEdge = new HashSet<>();
+            evaluatedEdge.add(edge);
+            newColorTuple.edgeColors.add(evaluatedEdge);
             edgeList.add(edge);
             v = Graphs.getOppositeVertex(graph, edge, v);
+            tmpVertex.add(v);
+            tmpVertex.add(v);
+            newColorTuple.vertexColors.add(tmpVertex);
         }
+        vertexEnd.add(endVertex);
+        vertexEnd.add(endVertex);
+        newColorTuple.vertexColors.add(vertexEnd);
+
+
 
         Collections.reverse(edgeList);
         double pathLength = iter.getShortestPathLength(endVertex);
-        path =
-            new GraphPathImpl<V, E>(
-                graph,
-                startVertex,
-                endVertex,
-                edgeList,
-                pathLength);
+        path = new GraphPathImpl<V, E>(graph, startVertex, endVertex, edgeList, pathLength);
     }
 }
 

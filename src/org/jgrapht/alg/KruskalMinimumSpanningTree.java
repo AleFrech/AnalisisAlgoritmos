@@ -57,9 +57,7 @@ import java.util.stream.Collectors;
 public class KruskalMinimumSpanningTree<V, E>
     implements MinimumSpanningTree<V, E>
 {
-    public ArrayList<GraphColorTuple<V, E>> getGraphList() {
-        return graphList;
-    }
+
 
     private ArrayList<GraphColorTuple<V, E>> graphList;
 
@@ -153,12 +151,14 @@ public class KruskalMinimumSpanningTree<V, E>
 
     }
 
-    
+    public ArrayList<GraphColorTuple<V, E>> getGraphList() {
+        return graphList;
+    }
 
     @Override public Set<E> getMinimumSpanningTreeEdgeSet()
     {
         return edgeList;
-    }
+}
 
     @Override public double getMinimumSpanningTreeTotalWeight()
     {
