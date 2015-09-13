@@ -2,6 +2,7 @@
  * Created by alefr on 9/11/2015.
  */
 
+import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgrapht.GraphColorTuple;
 import org.jgrapht.ext.JGraphModelAdapter;
@@ -142,5 +143,24 @@ public class GraphManager {
         AttributeMap cellAttr = new AttributeMap();
         cellAttr.put(cell, attr);
         jgAdapter.edit(cellAttr, null, null, null);
+    }
+
+    public void adjustDisplaySettings(JGraph jg,Dimension DEFAULT_SIZE,Color BACKGROUND_COLOR)
+    {
+        jg.setPreferredSize(DEFAULT_SIZE);
+
+        Color c = BACKGROUND_COLOR;
+        String colorStr = null;
+
+        try {
+            //colorStr = getParameter("bgcolor");
+        } catch (Exception ignored) {
+        }
+
+        if (colorStr != null) {
+            c = Color.decode(colorStr);
+        }
+
+        jg.setBackground(c);
     }
 }

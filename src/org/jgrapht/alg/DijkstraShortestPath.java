@@ -76,9 +76,7 @@ public final class DijkstraShortestPath<V, E>
      * @param startVertex the vertex at which the path should start
      * @param endVertex the vertex at which the path should end
      */
-    public DijkstraShortestPath(Graph<V, E> graph,
-        V startVertex,
-        V endVertex)
+    public DijkstraShortestPath(Graph<V, E> graph, V startVertex, V endVertex)
     {
         this(graph, startVertex, endVertex, Double.POSITIVE_INFINITY);
     }
@@ -99,12 +97,10 @@ public final class DijkstraShortestPath<V, E>
     public DijkstraShortestPath(Graph<V, E> graph, V startVertex, V endVertex, double radius)
     {
 
-
         if (!graph.containsVertex(endVertex)) {
             throw new IllegalArgumentException(
                 "graph must contain the end vertex");
         }
-
 
         Set<V> vertexStart = new HashSet<>();
 
