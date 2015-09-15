@@ -63,9 +63,11 @@ public final class DijkstraShortestPath<V, E>
     private GraphPath<V, E> path;
     private ArrayList<GraphColorTuple<V, E>> graphList;
     private GraphColorTuple<V,E> newColorTuple= new GraphColorTuple<>();
+    private List<V> dijkstraVertexPath=null;
 
 
-    
+
+
 
     /**
      * Creates and executes a new DijkstraShortestPath algorithm instance. An
@@ -112,6 +114,7 @@ public final class DijkstraShortestPath<V, E>
         for(int i=0;i<vertexList.size();i++){
             if(vertexList.get(i).equals(startVertex)){
                  source = vertexList.get(i);
+               // dijkstraVertexPath.add(vertexList.get(i));
             }
             if(vertexList.get(i).equals(startVertex)){
                 target= vertexList.get(i);
@@ -154,6 +157,10 @@ public final class DijkstraShortestPath<V, E>
         } else {
             return path.getEdgeList();
         }
+    }
+
+    public List<V> getVertexPath(){
+        return dijkstraVertexPath;
     }
 
     /**
@@ -207,6 +214,8 @@ public final class DijkstraShortestPath<V, E>
         return alg.getPathEdgeList();
     }
 
+
+
     private void createEdgeList(Graph<V, E> graph, ClosestFirstIterator<V, E> iter, V startVertex, V endVertex)
     {
         List<E> edgeList = new ArrayList<E>();
@@ -214,6 +223,8 @@ public final class DijkstraShortestPath<V, E>
         Set<V>  tmpVertex = new HashSet<>();
 
         V v = endVertex;
+
+        V vert=null;
 
         while (true) {
             E edge = iter.getSpanningTreeEdge(v);
@@ -226,6 +237,8 @@ public final class DijkstraShortestPath<V, E>
             newColorTuple.edgeColors.add(evaluatedEdge);
             edgeList.add(edge);
             v = Graphs.getOppositeVertex(graph, edge, v);
+
+           // dijkstraVertexPath.add(v);
             tmpVertex.add(v);
             tmpVertex.add(v);
             newColorTuple.vertexColors.add(tmpVertex);
@@ -233,12 +246,14 @@ public final class DijkstraShortestPath<V, E>
         vertexEnd.add(endVertex);
         vertexEnd.add(endVertex);
         newColorTuple.vertexColors.add(vertexEnd);
+        //dijkstraVertexPath.add(endVertex);
 
 
 
         Collections.reverse(edgeList);
         double pathLength = iter.getShortestPathLength(endVertex);
         path = new GraphPathImpl<V, E>(graph, startVertex, endVertex, edgeList, pathLength);
+        dijkstraVertexPath=Graphs.getPathVertexList(path);
     }
 }
 

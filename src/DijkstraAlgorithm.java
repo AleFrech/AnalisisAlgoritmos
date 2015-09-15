@@ -45,6 +45,9 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
     protected Set<DefaultWeightedEdge> edgeSet;
     protected boolean isPlaying = false;
     protected boolean dijkstraFlag=false;
+    protected java.util.List<DefaultWeightedEdge> dijkstraEdgePath;
+    protected java.util.List<String> dijkstraVertexPath;
+    protected ArrayList<Object> dijkstraFullPath=new ArrayList<>();
     protected Timer timer;
     private JGraphModelAdapter<String, DefaultWeightedEdge> jgAdapter;
     protected GraphManager graphManager = new GraphManager();
@@ -58,6 +61,7 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
         frame.getContentPane().add(applet);
         frame.setTitle("Dijkstra Algorithm");
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
@@ -120,12 +124,25 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
                     dijkstraGraph=executeDijkstra(file);
             }
         }else if(e.getSource()==NextButton){
-            actualPosition++;
-            graphManager.paintGraphDijkstra(actualPosition,graphColorTupleList,vertexSet,edgeSet,jgAdapter);
+                if(dijkstraFullPath!=null) {
+                    if(actualPosition<dijkstraFullPath.size()) {
+                        graphManager.playNextDijkstra(dijkstraFullPath,actualPosition,jgAdapter);
+                        actualPosition++;
+                    }
+                }
+
         }else if(e.getSource()==PreviousButton){
-            if(actualPosition>0)
+            if(actualPosition>0) {
                 actualPosition--;
-            graphManager.paintGraphDijkstra(actualPosition,graphColorTupleList,vertexSet,edgeSet,jgAdapter);
+                System.out.println("Prev");
+                if(dijkstraEdgePath!=null) {
+                    if(actualPosition<dijkstraFullPath.size()) {
+                        graphManager.playPrevDijkstra(dijkstraFullPath,actualPosition,jgAdapter);
+                    }
+                }
+            }
+
+
         }else if(e.getSource()==PlayPauseButton){
             isPlaying = !isPlaying;
             if(!isPlaying){
@@ -137,7 +154,7 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
 
             StartVertex = JOptionPane.showInputDialog(null,"Ingrese Vertice Origen","Select Vertex",JOptionPane.INFORMATION_MESSAGE);
             EndVertex =   JOptionPane.showInputDialog(null,"Ingrese Vertice Destino","Select Vertex",JOptionPane.INFORMATION_MESSAGE);
-            if(StartVertex.equals("")|| EndVertex.equals("")|| StartVertex==null|| EndVertex==null) {
+            if(StartVertex==null|| EndVertex==null||StartVertex.equals("")|| EndVertex.equals("") ) {
                 JOptionPane.showMessageDialog(null,"Porfavor Ingresar Ambos Vertices","Error!!!",JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -149,8 +166,13 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
 
         ActionListener a = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                if(isPlaying&&(graphColorTupleList.size()>actualPosition)){
-                    graphManager.paintGraphDijkstra(actualPosition,graphColorTupleList,vertexSet,edgeSet,jgAdapter);
+                if(dijkstraEdgePath!=null) {
+                    if(isPlaying&&(dijkstraFullPath.size()>actualPosition)){
+                        if (actualPosition < dijkstraFullPath.size()) {
+                            graphManager.playNextDijkstra(dijkstraFullPath, actualPosition, jgAdapter);
+                            actualPosition++;
+                        }
+                    }
                 }else{
                     timer.stop();
                 }
@@ -210,21 +232,41 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
     private void executeDijkstraPart2( ListenableDirectedWeightedGraph<String,DefaultWeightedEdge> g){
         DijkstraShortestPath<String,DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<String, DefaultWeightedEdge>(g,StartVertex,EndVertex);
         graphColorTupleList=dijkstraShortestPath.getGraphList();
+        dijkstraEdgePath= dijkstraShortestPath.getPathEdgeList();
+        dijkstraVertexPath=dijkstraShortestPath.getVertexPath();
+
+
+
+        for(int i=0;i<dijkstraVertexPath.size();i++){
+            if(dijkstraVertexPath.get(i)!=null) {
+                dijkstraFullPath.add(dijkstraVertexPath.get(i));
+                System.out.println(dijkstraVertexPath.get(i).toString());
+            }
+            if(i<dijkstraEdgePath.size()) {
+                dijkstraFullPath.add(dijkstraEdgePath.get(i));
+                System.out.println(dijkstraEdgePath.get(i).toString());
+            }
+
+        }
+
+
+
+
         for (DefaultWeightedEdge defaultWeightedEdge : dijkstraShortestPath.getPathEdgeList()) {
+
             System.out.println(defaultWeightedEdge.toString());
 
         }
+
         org.jgrapht.GraphColorTuple<String,DefaultWeightedEdge> graphColorTuple=new GraphColorTuple<>();
         graphColorTuple.vertexColors.add(new HashSet<>());
         graphColorTuple.vertexColors.add(new HashSet<>());
-        // graphColorTupleList.add(graphColorTuple);
         actualPosition = 0;
-        graphManager.paintGraphDijkstra(actualPosition,graphColorTupleList,vertexSet,edgeSet,jgAdapter);
         System.out.println("Finished Algorithm");
 
 
     }
-
+    
 
     public void adjustDisplaySettings(JGraph jg)
     {
