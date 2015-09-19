@@ -60,7 +60,7 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
         JFrame frame = new JFrame();
         frame.getContentPane().add(applet);
         frame.setTitle("Dijkstra Algorithm");
-        frame.pack();
+        frame.setSize(800,600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -73,8 +73,7 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
         resize(DEFAULT_SIZE);
 
         controlsPanel = new JPanel();
-        controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.X_AXIS));
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
         getContentPane().add(controlsPanel);
 
         MakeDijkstraButton= new JButton("Dijkstra");
@@ -196,6 +195,7 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(file.getPath()))){
             String line;
             int ammountofEdges=-1;
+
             while ((line = reader.readLine()) != null) {
                 String splitedVals[] = line.split(",");
                 if(g.addVertex(splitedVals[0])){
@@ -249,14 +249,6 @@ public class DijkstraAlgorithm extends JApplet implements ActionListener
 
         }
 
-
-
-
-        for (DefaultWeightedEdge defaultWeightedEdge : dijkstraShortestPath.getPathEdgeList()) {
-
-            System.out.println(defaultWeightedEdge.toString());
-
-        }
 
         org.jgrapht.GraphColorTuple<String,DefaultWeightedEdge> graphColorTuple=new GraphColorTuple<>();
         graphColorTuple.vertexColors.add(new HashSet<>());

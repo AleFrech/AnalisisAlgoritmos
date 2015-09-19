@@ -53,6 +53,7 @@ public class GraphColoring extends JApplet implements ActionListener
         frame.getContentPane().add(applet);
         frame.setTitle("Graph Coloring");
         frame.pack();
+        frame.setSize(800,600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -65,7 +66,6 @@ public class GraphColoring extends JApplet implements ActionListener
         resize(DEFAULT_SIZE);
 
         controlsPanel = new JPanel();
-        controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.X_AXIS));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
         getContentPane().add(controlsPanel);
 
